@@ -1,0 +1,56 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: taiki-e/install-action@nextest
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup update stable
+      - name: Install Deps
+        run: sudo apt-get install -y librust-atk-dev libgtk-3-dev
+      - name: Build
+        run: cargo build
+      - name: Run tests
+        run: cargo nextest run --verbose
+      # Zip .firefly and upload as an artifact
+      - name: Archive .basher
+        run: zip -r basher.zip .basher
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: basher
+          path: basher.zip
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: taiki-e/install-action@nextest
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: |
+          rustup update nightly
+      - name: Install cargo-llvm-cov
+        run: rustup component add llvm-tools-preview --toolchain nightly
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: taiki-e/install-action@nextest
+      - name: Collect coverage data (including doctests)
+        run: |
+          cargo llvm-cov --no-report nextest --ignore-filename-regex calloop-0.10.6/*
+          cargo llvm-cov report --lcov --output-path lcov.info  --ignore-filename-regex calloop-0.10.6/*
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
