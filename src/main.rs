@@ -1,4 +1,6 @@
 
+mod quad;
+
 use basher_rerun::BasherRerun;
 use ::log::LevelFilter;
 use ::rerun::{Scalar, SeriesPoint};
