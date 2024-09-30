@@ -28,7 +28,7 @@ jobs:
       - name: Archive .basher
         run: zip -r basher.zip .basher
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: basher
           path: basher.zip
