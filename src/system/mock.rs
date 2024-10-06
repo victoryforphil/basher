@@ -32,7 +32,7 @@ mod tests {
 
     #[test]
     fn test_mock_system() {
-        let mut state = BasherState {};
+        let mut state = BasherState::new();
         let mut system = MockSystem::new();
         system.init(&mut state);
         assert_eq!(system.value, 1);
