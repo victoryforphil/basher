@@ -7,6 +7,7 @@ use ::log::LevelFilter;
 use ::rerun::{Scalar, SeriesPoint};
 use basher::system::quad::MockQuad;
 use basher::system::runner::BasherSysRunner;
+use basher::system::simulation::exact_control::ExactControlSystem;
 use basher_rerun::BasherRerun;
 use rerun::*;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
@@ -31,8 +32,10 @@ fn main() {
     info!("[Basher Main] Starting Basher...");
 
     let quad_system = MockQuad::new();
+    let physics_system = ExactControlSystem::new();
     let mut runner = BasherSysRunner::new();
     runner.add_system(Box::new(quad_system));
+    runner.add_system(Box::new(physics_system));
 
     // Set desired post to be 5m above current quad position
     runner.state.quad.quad_goal_pose.position = nalgebra::Vector3::new(0.0, 0.0, 5.0);
