@@ -4,7 +4,7 @@ use std::{
 };
 
 use rerun::RecordingStreamBuilder;
-
+pub mod types;
 pub type BashRerunHandle = Arc<Mutex<BasherRerun>>;
 #[derive(Debug, Clone, PartialEq)]
 pub enum RerunMode {

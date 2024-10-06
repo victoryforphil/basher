@@ -12,7 +12,6 @@ pub struct BasherSysRunner {
     pub systems: Vec<SystemHandle>,
     pub state: BasherState,
     pub end_time: Timepoint,
-
 }
 
 impl BasherSysRunner {
@@ -30,11 +29,11 @@ impl BasherSysRunner {
     }
 
     pub fn run(&mut self, duration: Timespan) {
-        self.end_time =  self.state.current_time.clone() + duration;
+        self.end_time = self.state.current_time.clone() + duration;
         for system in self.systems.iter_mut() {
             system.init(&mut self.state);
         }
-        
+
         while &self.state.current_time < &self.end_time {
             for system in self.systems.iter_mut() {
                 system.execute(&mut self.state);

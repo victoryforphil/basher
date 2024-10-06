@@ -1,3 +1,5 @@
+use rerun::{AsComponents, Points3D, Vec3D};
+
 #[derive(Debug, Clone)]
 pub struct QuadPose {
     pub position: nalgebra::Vector3<f64>,
