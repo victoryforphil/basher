@@ -1,14 +1,19 @@
-mod quad;
 mod state;
 mod system;
+mod types;
+
 use ::log::info;
 use ::log::LevelFilter;
 use ::rerun::{Scalar, SeriesPoint};
+use basher::system::quad::MockQuad;
+use basher::system::runner::BasherSysRunner;
 use basher_rerun::BasherRerun;
 use rerun::*;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
 mod basher_rerun;
 fn main() {
+    pretty_env_logger::init();
+    /* TODO: Re-enable once rerun is a system
     //TOOD: Expose this to its own configurable logging setting, lua?
     let mode = BasherRerun::get_rerun_env();
     if mode == basher_rerun::RerunMode::Save {
@@ -22,19 +27,24 @@ fn main() {
         "999".to_string(),
     );
     rerun.create_rerun();
-
+    */
     info!("[Basher Main] Starting Basher...");
 
-    for i in 0..10 {
-        info!("[Basher Main] Iteration {}", i);
-        rerun.rerun().unwrap().set_time_seconds("time", i);
-        rerun
-            .rerun()
-            .unwrap()
-            .log("test_data", &Scalar::new(i as f64))
-            .expect("Failed to log data");
-        std::thread::sleep(std::time::Duration::from_secs(1));
-    }
+    let quad_system = MockQuad::new();
+    let mut runner = BasherSysRunner::new();
+    runner.add_system(Box::new(quad_system));
+
+    // Set desired post to be 5m above current quad position
+    runner.state.quad.quad_goal_pose.position = nalgebra::Vector3::new(0.0, 0.0, 5.0);
+
+    runner.run(std::time::Duration::from_secs(5));
+
+    info!("[Basher Main] Basher finished");
+    // Print final quad position
+    info!(
+        "[Basher Main] Quad final position: {:?}",
+        runner.state.quad.quad_current_pose.position
+    );
 }
 #[cfg(test)]
 mod tests {

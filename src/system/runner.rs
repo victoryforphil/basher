@@ -14,7 +14,7 @@ impl BasherSysRunner {
     pub fn new() -> BasherSysRunner {
         BasherSysRunner {
             systems: Vec::new(),
-            state: BasherState {},
+            state: BasherState::new(),
             end_time: Instant::now(),
         }
     }
