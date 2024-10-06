@@ -3,6 +3,7 @@ pub mod mock;
 pub mod quad;
 pub mod runner;
 pub mod simulation;
+pub mod viz;
 pub trait System {
     fn get_settings(&self) -> SystemSettings {
         SystemSettings::default()
