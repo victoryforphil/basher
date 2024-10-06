@@ -1,4 +1,9 @@
-use crate::{system::System, types::QuadPose};
+use log::info;
+
+use crate::{
+    system::{System, SystemSettings},
+    types::QuadPose,
+};
 
 pub struct MockQuad {}
 
@@ -9,7 +14,13 @@ impl MockQuad {
 }
 
 impl System for MockQuad {
-    fn init(&mut self, state: &mut crate::state::BasherState) {}
+    fn get_settings(&self) -> crate::system::SystemSettings {
+        SystemSettings::new(String::from("Mock Quad"))
+    }
+
+    fn init(&mut self, state: &mut crate::state::BasherState) {
+        info!("Initializing Mock Quad");
+    }
 
     fn execute(&mut self, state: &mut crate::state::BasherState) {
         let position = state.quad.quad_current_pose.position;
@@ -18,7 +29,7 @@ impl System for MockQuad {
         let acceleration = velocity - state.quad.quad_current_pose.velocity;
 
         state.quad.quad_desired_pose = QuadPose::new()
-            .with_position(position)
+            .with_position(state.quad.quad_goal_pose.position)
             .with_velocity(velocity)
             .with_acceleration(acceleration)
             .with_orientation(state.quad.quad_current_pose.orientation)

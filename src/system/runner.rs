@@ -1,5 +1,7 @@
 use std::time::{Duration, Instant};
 
+use log::info;
+
 use crate::state::BasherState;
 
 use super::SystemHandle;
@@ -20,6 +22,7 @@ impl BasherSysRunner {
     }
 
     pub fn add_system(&mut self, system: SystemHandle) {
+        info!("Adding System: {}", system.get_settings().name);
         self.systems.push(system);
     }
 
