@@ -55,7 +55,7 @@ mod tests {
         let mut state = BasherState::new();
         let mut system = MockQuad::new();
         system.init(&mut state);
-        system.execute(&mut state);
+        system.execute(&mut state, Timespan::zero());
         system.cleanup(&mut state);
     }
 
@@ -67,7 +67,7 @@ mod tests {
         state.quad.quad_current_pose.position = nalgebra::Vector3::new(0.0, 0.0, 0.0);
         state.quad.quad_goal_pose.position = nalgebra::Vector3::new(0.0, 0.0, 10.0);
         state.quad.setting_max_vert_vel = 1.0;
-        system.execute(&mut state);
+        system.execute(&mut state, Timespan::new_hz(100.0));
 
         system.cleanup(&mut state);
     }

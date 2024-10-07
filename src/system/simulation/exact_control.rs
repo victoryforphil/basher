@@ -82,7 +82,7 @@ mod tests {
 
         // Set Desired Pose
         state.quad.quad_desired_pose.position = nalgebra::Vector3::new(0.0, 0.0, 10.0);
-        system.execute(&mut state);
+        system.execute(&mut state, Timespan::new_hz(100.0));
 
         assert_eq!(
             state.quad.quad_current_pose.position,
