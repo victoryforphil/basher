@@ -1,3 +1,5 @@
+use victory_time_rs::Timespan;
+
 use crate::state;
 pub mod mock;
 pub mod quad;
@@ -9,7 +11,7 @@ pub trait System {
         SystemSettings::default()
     }
     fn init(&mut self, state: &mut state::BasherState);
-    fn execute(&mut self, state: &mut state::BasherState);
+    fn execute(&mut self, state: &mut state::BasherState, dt: Timespan);
     fn cleanup(&mut self, state: &mut state::BasherState);
 }
 
