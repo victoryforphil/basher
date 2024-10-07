@@ -35,7 +35,7 @@ fn main() {
     info!("[Basher Main] Starting Basher...");
 
     let quad_system = MockQuad::new();
-    let physics_system = ExactControlSystem::new();
+    let physics_system = ExactControlSystem::new_acceleration();
     let rerun_system = RerunSystem::new("basher".to_string());
     let mut runner = BasherSysRunner::new();
     runner.add_system(Box::new(quad_system));

@@ -1,4 +1,5 @@
 use log::warn;
+use victory_time_rs::Timespan;
 
 use crate::{
     basher_rerun::{types::RerunQuadPose, BasherRerun},
@@ -26,7 +27,7 @@ impl System for RerunSystem {
         self.basher_rerun.create_rerun();
     }
 
-    fn execute(&mut self, state: &mut crate::state::BasherState) {
+    fn execute(&mut self, state: &mut crate::state::BasherState, _dt: Timespan) {
         let rerun = &mut self.basher_rerun.rerun;
 
         let rerun = if let Some(rerun) = rerun {
@@ -37,18 +38,17 @@ impl System for RerunSystem {
         };
 
         rerun.set_time_seconds("system-time", state.current_time.secs());
-        rerun.log(
-            "quad/pose/current",
-            &RerunQuadPose::from(state.quad.quad_current_pose.clone()),
-        );
-        rerun.log(
-            "quad/pose/goal",
-            &RerunQuadPose::from(state.quad.quad_goal_pose.clone()),
-        );
-        rerun.log(
-            "quad/pose/desired",
-            &RerunQuadPose::from(state.quad.quad_desired_pose.clone()),
-        );
+        
+        {
+            let current_viz:RerunQuadPose = state.quad.quad_current_pose.clone().into();
+            current_viz.log_pose("current", rerun);
+            
+            let desired_viz:RerunQuadPose = state.quad.quad_desired_pose.clone().into();
+            desired_viz.log_pose("desired", rerun);
+
+            let goal_viz:RerunQuadPose = state.quad.quad_goal_pose.clone().into();
+            goal_viz.log_pose("goal", rerun);
+        }
     }
 
     fn cleanup(&mut self, state: &mut crate::state::BasherState) {}

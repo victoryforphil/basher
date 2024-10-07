@@ -1,3 +1,5 @@
+use victory_time_rs::Timespan;
+
 use super::System;
 
 pub struct MockSystem {
@@ -15,7 +17,7 @@ impl System for MockSystem {
         self.value = 1;
     }
 
-    fn execute(&mut self, state: &mut crate::state::BasherState) {
+    fn execute(&mut self, state: &mut crate::state::BasherState, _dt: Timespan) {
         self.value = 2;
     }
 

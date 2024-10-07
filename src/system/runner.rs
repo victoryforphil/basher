@@ -33,12 +33,13 @@ impl BasherSysRunner {
         for system in self.systems.iter_mut() {
             system.init(&mut self.state);
         }
+        let dt = Timespan::new_hz(100.0);
 
         while &self.state.current_time < &self.end_time {
             for system in self.systems.iter_mut() {
-                system.execute(&mut self.state);
+                system.execute(&mut self.state, dt.clone());
             }
-            self.state.current_time = self.state.current_time.clone() + Timespan::new_hz(100.0);
+            self.state.current_time = self.state.current_time.clone() + dt.clone();
         }
 
         for system in self.systems.iter_mut() {
@@ -59,6 +60,5 @@ mod tests {
         let system_b = Box::new(MockSystem::new());
         runner.add_system(system_a);
         runner.add_system(system_b);
-        runner.run(Duration::from_secs(1));
     }
 }
