@@ -8,13 +8,15 @@ use ::rerun::{Scalar, SeriesPoint};
 use basher::system::quad::MockQuad;
 use basher::system::runner::BasherSysRunner;
 use basher::system::simulation::exact_control::ExactControlSystem;
+use basher::system::viz::rerun_system::RerunSystem;
 use basher_rerun::BasherRerun;
 use rerun::*;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
+
 use victory_time_rs::Timespan;
 mod basher_rerun;
 fn main() {
-    pretty_env_logger::init();
+    // pretty_env_logger::init();
     /* TODO: Re-enable once rerun is a system
     //TOOD: Expose this to its own configurable logging setting, lua?
     let mode = BasherRerun::get_rerun_env();
@@ -34,10 +36,11 @@ fn main() {
 
     let quad_system = MockQuad::new();
     let physics_system = ExactControlSystem::new();
+    let rerun_system = RerunSystem::new("basher".to_string());
     let mut runner = BasherSysRunner::new();
     runner.add_system(Box::new(quad_system));
     runner.add_system(Box::new(physics_system));
-
+    runner.add_system(Box::new(rerun_system));
     // Set desired post to be 5m above current quad position
     runner.state.quad.quad_goal_pose.position = nalgebra::Vector3::new(0.0, 0.0, 5.0);
 
