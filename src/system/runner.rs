@@ -1,6 +1,8 @@
 use std::time::{Duration, Instant};
 
 use log::info;
+use rerun::Time;
+use victory_time_rs::{Timepoint, Timespan};
 
 use crate::state::BasherState;
 
@@ -9,7 +11,8 @@ use super::SystemHandle;
 pub struct BasherSysRunner {
     pub systems: Vec<SystemHandle>,
     pub state: BasherState,
-    end_time: Instant,
+    pub end_time: Timepoint,
+
 }
 
 impl BasherSysRunner {
@@ -17,7 +20,7 @@ impl BasherSysRunner {
         BasherSysRunner {
             systems: Vec::new(),
             state: BasherState::new(),
-            end_time: Instant::now(),
+            end_time: Timepoint::zero(),
         }
     }
 
@@ -26,16 +29,17 @@ impl BasherSysRunner {
         self.systems.push(system);
     }
 
-    pub fn run(&mut self, duration: Duration) {
-        self.end_time = Instant::now() + duration;
+    pub fn run(&mut self, duration: Timespan) {
+        self.end_time =  self.state.current_time.clone() + duration;
         for system in self.systems.iter_mut() {
             system.init(&mut self.state);
         }
-
-        while Instant::now() < self.end_time {
+        
+        while &self.state.current_time < &self.end_time {
             for system in self.systems.iter_mut() {
                 system.execute(&mut self.state);
             }
+            self.state.current_time = self.state.current_time.clone() + Timespan::new_hz(100.0);
         }
 
         for system in self.systems.iter_mut() {

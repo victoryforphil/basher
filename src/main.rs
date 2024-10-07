@@ -11,6 +11,7 @@ use basher::system::simulation::exact_control::ExactControlSystem;
 use basher_rerun::BasherRerun;
 use rerun::*;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
+use victory_time_rs::Timespan;
 mod basher_rerun;
 fn main() {
     pretty_env_logger::init();
@@ -40,13 +41,19 @@ fn main() {
     // Set desired post to be 5m above current quad position
     runner.state.quad.quad_goal_pose.position = nalgebra::Vector3::new(0.0, 0.0, 5.0);
 
-    runner.run(std::time::Duration::from_secs(5));
+    runner.run(Timespan::new_secs(10.0));
 
     info!("[Basher Main] Basher finished");
     // Print final quad position
     info!(
         "[Basher Main] Quad final position: {:?}",
         runner.state.quad.quad_current_pose.position
+    );
+
+    // Print current time
+    info!(
+        "[Basher Main] Current time: {:?}",
+        runner.state.current_time
     );
 }
 #[cfg(test)]
