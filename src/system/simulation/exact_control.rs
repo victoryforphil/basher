@@ -6,7 +6,7 @@ use crate::{
     system::{System, SystemSettings},
 };
 
-pub enum ExactControlMode{
+pub enum ExactControlMode {
     DesiredPosition,
     DesiredVelocity,
     DesiredAcceleration,
@@ -15,25 +15,25 @@ pub enum ExactControlMode{
 /// System to set the current UAV pose to it's desired pose
 /// This acts a short-circuit to the control system and is used for testing
 pub struct ExactControlSystem {
-    pub control_mode : ExactControlMode,
+    pub control_mode: ExactControlMode,
 }
 
 impl ExactControlSystem {
     pub fn new() -> ExactControlSystem {
         ExactControlSystem {
-            control_mode : ExactControlMode::DesiredPosition,
+            control_mode: ExactControlMode::DesiredPosition,
         }
     }
 
     pub fn new_velocity() -> ExactControlSystem {
         ExactControlSystem {
-            control_mode : ExactControlMode::DesiredVelocity,
+            control_mode: ExactControlMode::DesiredVelocity,
         }
     }
 
     pub fn new_acceleration() -> ExactControlSystem {
         ExactControlSystem {
-            control_mode : ExactControlMode::DesiredAcceleration,
+            control_mode: ExactControlMode::DesiredAcceleration,
         }
     }
 }
@@ -48,20 +48,26 @@ impl System for ExactControlSystem {
     fn execute(&mut self, state: &mut BasherState, dt: Timespan) {
         match self.control_mode {
             ExactControlMode::DesiredPosition => {
-                state.quad.quad_current_pose.position = state.quad.quad_desired_pose.position.clone();
-            },
+                state.quad.quad_current_pose.position =
+                    state.quad.quad_desired_pose.position.clone();
+            }
             ExactControlMode::DesiredVelocity => {
-                state.quad.quad_current_pose.velocity = state.quad.quad_desired_pose.velocity.clone();
+                state.quad.quad_current_pose.velocity =
+                    state.quad.quad_desired_pose.velocity.clone();
                 //Based on the desired velocity, update the position according to dt
-                state.quad.quad_current_pose.position += state.quad.quad_current_pose.velocity * dt.secs();
-            },
+                state.quad.quad_current_pose.position +=
+                    state.quad.quad_current_pose.velocity * dt.secs();
+            }
             ExactControlMode::DesiredAcceleration => {
-                state.quad.quad_current_pose.acceleration = state.quad.quad_desired_pose.acceleration.clone();
+                state.quad.quad_current_pose.acceleration =
+                    state.quad.quad_desired_pose.acceleration.clone();
                 //Based on the desired acceleration, update the velocity according to dt
-                state.quad.quad_current_pose.velocity += state.quad.quad_current_pose.acceleration * dt.secs();
+                state.quad.quad_current_pose.velocity +=
+                    state.quad.quad_current_pose.acceleration * dt.secs();
                 //Based on the desired velocity, update the position according to dt
-                state.quad.quad_current_pose.position += state.quad.quad_current_pose.velocity * dt.secs();
-            },
+                state.quad.quad_current_pose.position +=
+                    state.quad.quad_current_pose.velocity * dt.secs();
+            }
         }
     }
 

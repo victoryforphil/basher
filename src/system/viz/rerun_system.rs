@@ -1,5 +1,6 @@
 use log::warn;
-use victory_time_rs::Timespan;
+use rerun::external::uuid::uuid;
+use victory_time_rs::{Timepoint, Timespan};
 
 use crate::{
     basher_rerun::{types::RerunQuadPose, BasherRerun},
@@ -12,8 +13,9 @@ pub struct RerunSystem {
 
 impl RerunSystem {
     pub fn new(name: String) -> RerunSystem {
+        let run_id = Timepoint::now().ms().to_string();
         RerunSystem {
-            basher_rerun: BasherRerun::new(name, "default-group".to_string(), "0".to_string()),
+            basher_rerun: BasherRerun::new(name, "default-group".to_string(), run_id),
         }
     }
 }
@@ -38,16 +40,22 @@ impl System for RerunSystem {
         };
 
         rerun.set_time_seconds("system-time", state.current_time.secs());
-        
+
         {
-            let current_viz:RerunQuadPose = state.quad.quad_current_pose.clone().into();
+            let current_viz: RerunQuadPose = state.quad.quad_current_pose.clone().into();
             current_viz.log_pose("current", rerun);
-            
-            let desired_viz:RerunQuadPose = state.quad.quad_desired_pose.clone().into();
+
+            let desired_viz: RerunQuadPose = state.quad.quad_desired_pose.clone().into();
             desired_viz.log_pose("desired", rerun);
 
-            let goal_viz:RerunQuadPose = state.quad.quad_goal_pose.clone().into();
+            let goal_viz: RerunQuadPose = state.quad.quad_goal_pose.clone().into();
             goal_viz.log_pose("goal", rerun);
+        }
+        {
+            for (i, waypoint) in state.commander.mission.waypoints.iter().enumerate() {
+                let waypoint_viz: RerunQuadPose = waypoint.pose.clone().into();
+                waypoint_viz.log_pose(&format!("waypoint-{}", i), rerun);
+            }
         }
     }
 
