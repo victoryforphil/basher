@@ -38,7 +38,7 @@ mod tests {
         let mut system = MockSystem::new();
         system.init(&mut state);
         assert_eq!(system.value, 1);
-        system.execute(&mut state);
+        system.execute(&mut state, Timespan::zero());
         assert_eq!(system.value, 2);
         system.cleanup(&mut state);
         assert_eq!(system.value, 3);
