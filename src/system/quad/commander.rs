@@ -48,6 +48,5 @@ impl System for CommanderSystem {
     }
 
     fn cleanup(&mut self, state: &mut BasherState) {
-        todo!()
     }
 }

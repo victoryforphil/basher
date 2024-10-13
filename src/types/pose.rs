@@ -62,6 +62,19 @@ impl QuadPose {
         self.angular_acceleration = angular_acceleration;
         self
     }
+
+    pub fn position_f32(&self) -> nalgebra::Vector3<f32> {
+        nalgebra::Vector3::new(
+            self.position.x as f32,
+            self.position.y as f32,
+            self.position.z as f32,
+        )
+    }
+
+    pub fn angel_axis_f32(&self) -> nalgebra::Vector3<f32> {
+        let (x,y,z) =  self.orientation.euler_angles();
+        nalgebra::Vector3::new(x as f32, y as f32, z as f32)
+    }
 }
 
 #[cfg(test)]
