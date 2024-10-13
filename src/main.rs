@@ -3,24 +3,20 @@ mod system;
 mod types;
 
 use ::log::info;
-use ::log::LevelFilter;
-use ::rerun::{Scalar, SeriesPoint};
 use nalgebra::Vector3;
 
-use rerun::*;
-use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
 
 use state::commander::Mission;
 
 use system::quad::CommanderSystem;
 use system::quad::MockQuad;
 use system::runner::BasherSysRunner;
-use system::simulation::exact_control::ExactControlSystem;
+use system::simulation::physics;
 use system::viz::rerun_system::RerunSystem;
 use victory_time_rs::Timespan;
 mod basher_rerun;
 fn main() {
-    // pretty_env_logger::init();
+    pretty_env_logger::init();
 
     info!("[Basher Main] Starting Basher...");
 
@@ -35,7 +31,9 @@ fn main() {
 
     let commander_system = CommanderSystem::new().with_mission(mission);
     let quad_system = MockQuad::new();
-    let physics_system = ExactControlSystem::new_acceleration();
+    // let physics_system = ExactControlSystem::new_acceleration();
+    let physics_system = physics::PhysicSimulationSystem::new();
+
     let rerun_system = RerunSystem::new("basher".to_string());
     let mut runner = BasherSysRunner::new();
     runner.add_system(Box::new(commander_system));
@@ -60,10 +58,10 @@ fn main() {
 }
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn test_main() {
-       // main();
+        // main();
     }
 }

@@ -4,7 +4,7 @@ use rapier3d::{
         CCDSolver, ImpulseJointSet, IntegrationParameters, IslandManager, MultibodyJointSet,
         RigidBodySet,
     },
-    geometry::{DefaultBroadPhase, ColliderSet, NarrowPhase},
+    geometry::{ColliderSet, DefaultBroadPhase, NarrowPhase},
     pipeline::{PhysicsPipeline, QueryPipeline},
 };
 
@@ -59,8 +59,7 @@ impl RapierContext {
     }
 }
 
-
-pub struct PhysicSimulationSystem{
+pub struct PhysicSimulationSystem {
     pub rapier_context: RapierContext,
 }
 

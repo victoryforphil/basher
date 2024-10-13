@@ -1,5 +1,4 @@
 use log::warn;
-use rerun::external::uuid::uuid;
 use victory_time_rs::{Timepoint, Timespan};
 
 use crate::{

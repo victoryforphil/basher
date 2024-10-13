@@ -1,5 +1,5 @@
 use nalgebra::Vector3;
-use rerun::{AsComponents, Points3D, RecordingStream, Scalar, SeriesPoint, Vec3D};
+use rerun::{Points3D, RecordingStream, Scalar, Vec3D};
 
 use crate::types::QuadPose;
 

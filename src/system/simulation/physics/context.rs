@@ -4,7 +4,7 @@ use rapier3d::{
         CCDSolver, ImpulseJointSet, IntegrationParameters, IslandManager, MultibodyJointSet,
         RigidBodySet,
     },
-    geometry::{DefaultBroadPhase, ColliderSet, NarrowPhase},
+    geometry::{ColliderSet, DefaultBroadPhase, NarrowPhase},
     pipeline::{PhysicsPipeline, QueryPipeline},
 };
 
