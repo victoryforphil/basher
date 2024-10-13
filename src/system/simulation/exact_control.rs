@@ -1,4 +1,3 @@
-use log::warn;
 use victory_time_rs::Timespan;
 
 use crate::{
@@ -78,7 +77,6 @@ impl System for ExactControlSystem {
 mod tests {
     use super::*;
     use crate::state::BasherState;
-    use crate::system::mock::MockSystem;
 
     #[test]
     fn test_exact_control_system() {

@@ -47,7 +47,5 @@ impl System for CommanderSystem {
         state.quad.quad_goal_pose = target_pose.clone();
     }
 
-    fn cleanup(&mut self, state: &mut BasherState) {
-        todo!()
-    }
+    fn cleanup(&mut self, state: &mut BasherState) {}
 }

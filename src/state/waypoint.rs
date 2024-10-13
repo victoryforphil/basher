@@ -1,5 +1,3 @@
-use nalgebra::Vector3;
-
 use crate::types::QuadPose;
 
 #[derive(Debug, Clone)]

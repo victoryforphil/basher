@@ -1,4 +1,4 @@
-use rerun::{AsComponents, Points3D, Vec3D};
+use nalgebra::Vector3;
 
 #[derive(Debug, Clone)]
 pub struct QuadPose {
@@ -35,8 +35,23 @@ impl QuadPose {
         self
     }
 
+    pub fn with_position_f32(mut self, position: nalgebra::Vector3<f32>) -> QuadPose {
+        self.position =
+            nalgebra::Vector3::new(position.x as f64, position.y as f64, position.z as f64);
+        self
+    }
+
     pub fn with_orientation(mut self, orientation: nalgebra::UnitQuaternion<f64>) -> QuadPose {
         self.orientation = orientation;
+        self
+    }
+
+    pub fn with_orientation_f32(mut self, orientation: nalgebra::UnitQuaternion<f32>) -> QuadPose {
+        self.orientation = nalgebra::UnitQuaternion::new(Vector3::new(
+            orientation.i as f64,
+            orientation.j as f64,
+            orientation.k as f64,
+        ));
         self
     }
 
@@ -45,13 +60,40 @@ impl QuadPose {
         self
     }
 
+    pub fn with_velocity_f32(mut self, velocity: nalgebra::Vector3<f32>) -> QuadPose {
+        self.velocity =
+            nalgebra::Vector3::new(velocity.x as f64, velocity.y as f64, velocity.z as f64);
+        self
+    }
+
     pub fn with_angular_velocity(mut self, angular_velocity: nalgebra::Vector3<f64>) -> QuadPose {
         self.angular_velocity = angular_velocity;
         self
     }
 
+    pub fn with_angular_velocity_f32(
+        mut self,
+        angular_velocity: nalgebra::Vector3<f32>,
+    ) -> QuadPose {
+        self.angular_velocity = nalgebra::Vector3::new(
+            angular_velocity.x as f64,
+            angular_velocity.y as f64,
+            angular_velocity.z as f64,
+        );
+        self
+    }
+
     pub fn with_acceleration(mut self, acceleration: nalgebra::Vector3<f64>) -> QuadPose {
         self.acceleration = acceleration;
+        self
+    }
+
+    pub fn with_acceleration_f32(mut self, acceleration: nalgebra::Vector3<f32>) -> QuadPose {
+        self.acceleration = nalgebra::Vector3::new(
+            acceleration.x as f64,
+            acceleration.y as f64,
+            acceleration.z as f64,
+        );
         self
     }
 
@@ -61,6 +103,31 @@ impl QuadPose {
     ) -> QuadPose {
         self.angular_acceleration = angular_acceleration;
         self
+    }
+
+    pub fn with_angular_acceleration_f32(
+        mut self,
+        angular_acceleration: nalgebra::Vector3<f32>,
+    ) -> QuadPose {
+        self.angular_acceleration = nalgebra::Vector3::new(
+            angular_acceleration.x as f64,
+            angular_acceleration.y as f64,
+            angular_acceleration.z as f64,
+        );
+        self
+    }
+
+    pub fn position_f32(&self) -> nalgebra::Vector3<f32> {
+        nalgebra::Vector3::new(
+            self.position.x as f32,
+            self.position.y as f32,
+            self.position.z as f32,
+        )
+    }
+
+    pub fn angel_axis_f32(&self) -> nalgebra::Vector3<f32> {
+        let (x, y, z) = self.orientation.euler_angles();
+        nalgebra::Vector3::new(x as f32, y as f32, z as f32)
     }
 }
 
