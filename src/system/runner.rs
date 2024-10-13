@@ -1,4 +1,3 @@
-
 use log::info;
 use victory_time_rs::{Timepoint, Timespan};
 

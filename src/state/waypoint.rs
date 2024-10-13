@@ -1,4 +1,3 @@
-
 use crate::types::QuadPose;
 
 #[derive(Debug, Clone)]

@@ -77,7 +77,6 @@ impl System for ExactControlSystem {
 mod tests {
     use super::*;
     use crate::state::BasherState;
-    
 
     #[test]
     fn test_exact_control_system() {

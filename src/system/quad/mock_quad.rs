@@ -1,4 +1,5 @@
 use log::info;
+use nalgebra::Vector3;
 use victory_time_rs::Timespan;
 
 use crate::{
@@ -26,10 +27,16 @@ impl System for MockQuad {
     fn execute(&mut self, state: &mut crate::state::BasherState, _dt: Timespan) {
         let position = state.quad.quad_current_pose.position;
         let mut direction = state.quad.quad_goal_pose.position - position;
-        // Clamp the direction vector to the max velocity
-        if direction.norm() > state.quad.setting_max_lat_vel {
-            direction = direction.normalize() * state.quad.setting_max_lat_vel;
+
+        if direction.norm() < 0.08 {
+            state.quad.quad_desired_pose = QuadPose::new()
+                .with_position(state.quad.quad_goal_pose.position)
+                .with_velocity(Vector3::new(0.0, 0.0, 0.0));
+            return;
         }
+        // Clamp the direction vector to the max velocity
+        direction = direction.normalize() * state.quad.setting_max_lat_vel;
+
         let velocity = direction;
         let acceleration = velocity - state.quad.quad_current_pose.velocity;
 

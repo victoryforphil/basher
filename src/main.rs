@@ -5,7 +5,6 @@ mod types;
 use ::log::info;
 use nalgebra::Vector3;
 
-
 use state::commander::Mission;
 
 use system::quad::CommanderSystem;
@@ -16,7 +15,7 @@ use system::viz::rerun_system::RerunSystem;
 use victory_time_rs::Timespan;
 mod basher_rerun;
 fn main() {
-    pretty_env_logger::init();
+    //pretty_env_logger::init();
 
     info!("[Basher Main] Starting Basher...");
 
@@ -58,7 +57,6 @@ fn main() {
 }
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn test_main() {

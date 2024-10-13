@@ -62,14 +62,13 @@ impl PhysicSimulationSystem {
 
         let control_pose = state.quad.quad_desired_pose.clone();
 
-        let desired_accel = control_pose.acceleration;
+        let desired_velocity = control_pose.velocity;
         // Apply acceleration to the rigid body
-        let new_velocity = gt_velocity
-            + Vector3::new(
-                desired_accel.x as f32,
-                desired_accel.y as f32,
-                desired_accel.z as f32,
-            );
+        let new_velocity = Vector3::new(
+            desired_velocity.x as f32,
+            desired_velocity.y as f32,
+            desired_velocity.z as f32,
+        );
         uav_rigid.set_linvel(new_velocity, true);
 
         // Update Quad state with GT
@@ -111,7 +110,9 @@ impl System for PhysicSimulationSystem {
             Some(&mut self.rapier_context.query_pipeline),
             &self.rapier_context.physics_hooks,
             &self.rapier_context.ev,
-        )
+        );
+
+        self.update_uav_actor(_state, _dt);
     }
 
     fn cleanup(&mut self, _state: &mut crate::state::BasherState) {}
