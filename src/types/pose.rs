@@ -1,6 +1,7 @@
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuadPose {
     pub position: nalgebra::Vector3<f64>,
     pub orientation: nalgebra::UnitQuaternion<f64>,

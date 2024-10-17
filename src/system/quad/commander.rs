@@ -1,6 +1,12 @@
+use std::collections::BTreeSet;
+
+use log::{debug, info};
+use victory_commander::system::System;
+use victory_data_store::{database::DataView, topics::TopicKey};
+use victory_time_rs::Timespan;
+
 use crate::{
     state::{commander::Mission, BasherState},
-    system::{System, SystemSettings},
 };
 
 pub struct CommanderSystem {
@@ -18,17 +24,21 @@ impl CommanderSystem {
 }
 
 impl System for CommanderSystem {
-    fn get_settings(&self) -> crate::system::SystemSettings {
-        SystemSettings::new("Commander".to_string())
+
+    fn name(&self) -> String {
+        "Commander".to_string()
     }
 
-    fn init(&mut self, state: &mut BasherState) {
+    fn init(&mut self) {
+        
+    }
+
+    fn execute(&mut self, state: &DataView, dt: Timespan) -> DataView {
+        debug!("[Commander] Executing: state");
+        let mut state: BasherState = state.get_latest(&TopicKey::from_str("basher_state")).unwrap_or_default();
         if let Some(mission) = &self.mission {
             state.commander.mission = mission.clone();
         }
-    }
-
-    fn execute(&mut self, state: &mut BasherState, dt: victory_time_rs::Timespan) {
         let mission = &state.commander.mission;
         let current_waypoint = &mission.waypoints[state.commander.current_target_index];
         let current_pose = &state.quad.quad_current_pose;
@@ -45,7 +55,16 @@ impl System for CommanderSystem {
 
         // Set the goal pose to the current target
         state.quad.quad_goal_pose = target_pose.clone();
+        let mut dataview = DataView::new();
+        dataview.add_latest(&TopicKey::from_str("basher_state"), &state);
+        dataview
     }
 
-    fn cleanup(&mut self, state: &mut BasherState) {}
+    fn cleanup(&mut self) {}
+    
+    fn get_subscribed_topics(&self) -> std::collections::BTreeSet<victory_data_store::topics::TopicKey> {
+        let mut topics = BTreeSet::new();
+        topics.insert(TopicKey::from_str("basher_state"));
+        topics
+    }
 }

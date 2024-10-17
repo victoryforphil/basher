@@ -1,10 +1,11 @@
 use nalgebra::Vector3;
+use serde::{Deserialize, Serialize};
 
 use crate::types::QuadPose;
 
 use super::waypoint::Waypoint;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Mission {
     pub waypoints: Vec<Waypoint>,
 }
@@ -35,12 +36,19 @@ impl Mission {
         Mission::new().with_waypoints(waypoints)
     }
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CommanderState {
     pub mission: Mission,
     pub current_target_index: usize,
 }
-
+impl Default for CommanderState {
+    fn default() -> Self {
+        CommanderState {
+            mission: Mission::new(),
+            current_target_index: 0,
+        }
+    }
+}
 impl CommanderState {
     pub fn new() -> CommanderState {
         CommanderState {

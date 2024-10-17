@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::types::QuadPose;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Waypoint {
     pub pose: QuadPose,
     pub accuracy: f64,
