@@ -12,6 +12,10 @@ multi_log = "0.1.2"
 pretty_env_logger = "0.5.0"
 rerun = "0.18.2"
 simplelog = "0.12.2"
-nalgebra = "*"
+serde = { version = "1.0.210", features = ["derive"] }
+nalgebra = {version = "*", features = ["serde-serialize"]}
 victory-time-rs = { git = "https://github.com/victoryforphil/victory-time", version = "0.1.1" }
 rapier3d = "0.22.0"
+victory-data-store = { git = "https://github.com/victoryforphil/victory-data-store.git", version = "0.1.7" }
+enum_dispatch = "0.3.13"
+victory-commander = { git = "https://github.com/victoryforphil/victory-commander.git", version = "0.0.1" }

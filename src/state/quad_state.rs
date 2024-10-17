@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 use crate::types::QuadPose;
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuadState {
     pub quad_current_pose: QuadPose,
     pub quad_goal_pose: QuadPose,

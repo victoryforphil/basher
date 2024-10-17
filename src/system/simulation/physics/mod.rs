@@ -1,14 +1,18 @@
 pub mod actor;
 pub mod context;
 
+use std::collections::BTreeSet;
+
 use actor::{PhysicsActor, PhysicsActorSettings};
 use context::RapierContext;
-use log::info;
+use log::{debug, info};
 use nalgebra::Vector3;
+use victory_commander::system::System;
+use victory_data_store::{database::DataView, topics::TopicKey};
+use victory_time_rs::Timespan;
 
 use crate::{
-    system::{System, SystemSettings},
-    types::QuadPose,
+    state::BasherState, types::QuadPose
 };
 
 pub struct PhysicSimulationSystem {
@@ -90,12 +94,17 @@ impl PhysicSimulationSystem {
 }
 
 impl System for PhysicSimulationSystem {
-    fn init(&mut self, _state: &mut crate::state::BasherState) {
+    fn name(&self) -> String {
+        "Physics".to_string()
+    }
+
+    fn init(&mut self) {
         info!("Initializing Physics Simulation System");
         self.quad.create(&mut self.rapier_context);
     }
 
-    fn execute(&mut self, _state: &mut crate::state::BasherState, _dt: victory_time_rs::Timespan) {
+    fn execute(&mut self, state: &DataView, _dt: Timespan) -> DataView {
+        let mut state: BasherState = state.get_latest(&TopicKey::from_str("basher_state")).unwrap();
         self.rapier_context.physics_pipeline.step(
             &self.rapier_context.gravity,
             &self.rapier_context.integration_params,
@@ -112,12 +121,18 @@ impl System for PhysicSimulationSystem {
             &self.rapier_context.ev,
         );
 
-        self.update_uav_actor(_state, _dt);
+        self.update_uav_actor(&mut state, _dt);
+        debug!("[Physics] Tick");
+        let mut out = DataView::new();
+        out.add_latest(&TopicKey::from_str("basher_state"), &state);
+        out
     }
 
-    fn cleanup(&mut self, _state: &mut crate::state::BasherState) {}
+    fn cleanup(&mut self) {}
 
-    fn get_settings(&self) -> SystemSettings {
-        SystemSettings::new("Physics Simulation System".to_string())
+    fn get_subscribed_topics(&self) -> std::collections::BTreeSet<TopicKey> {
+        let mut topics = BTreeSet::new();
+        topics.insert(TopicKey::from_str("basher_state"));
+        topics
     }
 }

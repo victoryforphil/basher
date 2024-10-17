@@ -1,9 +1,12 @@
+use std::collections::BTreeSet;
+
+use victory_commander::system::System;
+use victory_data_store::{database::DataView, topics::TopicKey};
 use victory_time_rs::Timespan;
 
-use crate::{
-    state::BasherState,
-    system::{System, SystemSettings},
-};
+use crate::state::BasherState;
+
+
 
 pub enum ExactControlMode {
     DesiredPosition,
@@ -38,14 +41,12 @@ impl ExactControlSystem {
 }
 
 impl System for ExactControlSystem {
-    fn get_settings(&self) -> SystemSettings {
-        SystemSettings::new(String::from("Exact Control"))
-    }
 
-    fn init(&mut self, state: &mut BasherState) {}
+    fn init(&mut self) {}
 
-    fn execute(&mut self, state: &mut BasherState, dt: Timespan) {
-        match self.control_mode {
+    fn execute(&mut self, state: &DataView, dt: Timespan) -> DataView {
+        let mut state: BasherState = state.get_latest(&TopicKey::from_str("basher_state")).unwrap();
+        match &self.control_mode {
             ExactControlMode::DesiredPosition => {
                 state.quad.quad_current_pose.position =
                     state.quad.quad_desired_pose.position.clone();
@@ -68,9 +69,19 @@ impl System for ExactControlSystem {
                     state.quad.quad_current_pose.velocity * dt.secs();
             }
         }
+        let mut state = state.clone();
+        let mut dataview = DataView::new();
+        dataview.add_latest(&TopicKey::from_str("basher_state"), &state);
+        dataview
     }
 
-    fn cleanup(&mut self, state: &mut BasherState) {}
+    fn cleanup(&mut self) {}
+    
+    fn get_subscribed_topics(&self) -> std::collections::BTreeSet<TopicKey> {
+        let mut topics = BTreeSet::new();
+        topics.insert(TopicKey::from_str("basher_state"));
+        topics
+    }
 }
 
 #[cfg(test)]
@@ -82,16 +93,21 @@ mod tests {
     fn test_exact_control_system() {
         let mut state = BasherState::new();
         let mut system = ExactControlSystem::new();
-        system.init(&mut state);
+        let mut dataview = DataView::new();
 
         // Set Desired Pose
         state.quad.quad_desired_pose.position = nalgebra::Vector3::new(0.0, 0.0, 10.0);
-        system.execute(&mut state, Timespan::new_hz(100.0));
+        
+        dataview.add_latest(&TopicKey::from_str("basher_state"), &state);
+        system.init();
+
+        let out = system.execute(&dataview, Timespan::new_hz(100.0));
+        let state: BasherState = out.get_latest(&TopicKey::from_str("basher_state")).unwrap();
 
         assert_eq!(
             state.quad.quad_current_pose.position,
             nalgebra::Vector3::new(0.0, 0.0, 10.0)
         );
-        system.cleanup(&mut state);
+        system.cleanup();
     }
 }

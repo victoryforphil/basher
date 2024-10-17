@@ -1,10 +1,14 @@
+use std::collections::BTreeSet;
+
 use log::warn;
+use serde::{Deserialize, Serialize};
+use victory_commander::system::System;
+use victory_data_store::{database::DataView, topics::TopicKey};
 use victory_time_rs::{Timepoint, Timespan};
 
-use crate::{
-    basher_rerun::{types::RerunQuadPose, BasherRerun},
-    system::{System, SystemSettings},
-};
+use crate::{basher_rerun::{types::RerunQuadPose, BasherRerun}, state::BasherState};
+
+
 
 pub struct RerunSystem {
     pub basher_rerun: BasherRerun,
@@ -18,24 +22,30 @@ impl RerunSystem {
         }
     }
 }
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct EmptyOut{
+
+}
+
+
+
 
 impl System for RerunSystem {
-    fn get_settings(&self) -> crate::system::SystemSettings {
-        SystemSettings::new(String::from("Rerun System"))
-    }
-
-    fn init(&mut self, state: &mut crate::state::BasherState) {
+ 
+    fn init(&mut self) {
         self.basher_rerun.create_rerun();
     }
 
-    fn execute(&mut self, state: &mut crate::state::BasherState, _dt: Timespan) {
+    fn execute(&mut self, state: &DataView, _dt: Timespan) -> DataView {
+        
+        let mut state: BasherState = state.get_latest(&TopicKey::from_str("basher_state")).unwrap();
         let rerun = &mut self.basher_rerun.rerun;
 
         let rerun = if let Some(rerun) = rerun {
             rerun
         } else {
             warn!("Rerun not found");
-            return;
+            return DataView::new();
         };
 
         rerun.set_time_seconds("system-time", state.current_time.secs());
@@ -56,7 +66,14 @@ impl System for RerunSystem {
                 waypoint_viz.log_pose(&format!("waypoint-{}", i), rerun);
             }
         }
+        DataView::new()
     }
 
-    fn cleanup(&mut self, state: &mut crate::state::BasherState) {}
+    fn cleanup(&mut self) {}
+    
+    fn get_subscribed_topics(&self) -> std::collections::BTreeSet<TopicKey> {
+        let mut topics = BTreeSet::new();
+        topics.insert(TopicKey::from_str("basher_state"));
+        topics
+    }
 }

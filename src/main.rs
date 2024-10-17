@@ -7,15 +7,18 @@ use nalgebra::Vector3;
 
 use state::commander::Mission;
 
+use state::BasherState;
 use system::quad::CommanderSystem;
 use system::quad::MockQuad;
-use system::runner::BasherSysRunner;
 use system::simulation::physics;
 use system::viz::rerun_system::RerunSystem;
+use victory_commander::system::runner::BasherSysRunner;
+use victory_data_store::topics::TopicKey;
+use victory_time_rs::Timepoint;
 use victory_time_rs::Timespan;
 mod basher_rerun;
 fn main() {
-    //pretty_env_logger::init();
+    pretty_env_logger::init();
 
     info!("[Basher Main] Starting Basher...");
 
@@ -35,24 +38,29 @@ fn main() {
 
     let rerun_system = RerunSystem::new("basher".to_string());
     let mut runner = BasherSysRunner::new();
-    runner.add_system(Box::new(commander_system));
-    runner.add_system(Box::new(quad_system));
-    runner.add_system(Box::new(physics_system));
-    runner.add_system(Box::new(rerun_system));
+    runner.add_system(std::sync::Arc::new(std::sync::Mutex::new(commander_system)));
+    runner.add_system(std::sync::Arc::new(std::sync::Mutex::new(quad_system)));
+    runner.add_system(std::sync::Arc::new(std::sync::Mutex::new(physics_system)));
+    runner.add_system(std::sync::Arc::new(std::sync::Mutex::new(rerun_system)));
     // Set desired post to be 5m above current quad position
-    runner.run(Timespan::new_secs(30.0));
-
+    runner.dt = Timespan::new_hz(1.0);
+    runner.run(Timepoint::new_secs(10.0));
+    // Dump datastore keys
+    let keys = runner.data_store.get_all_keys();
+    info!("[Basher Main] Datastore keys: {:#?}", keys);
+    let state: BasherState = runner.data_store.get_struct(&TopicKey::from_str("basher_state")).unwrap();
+    info!("[Basher Main] Quad final position: {:?}", state.quad.quad_current_pose.position);
     info!("[Basher Main] Basher finished");
     // Print final quad position
     info!(
         "[Basher Main] Quad final position: {:?}",
-        runner.state.quad.quad_current_pose.position
+        state.quad.quad_current_pose.position
     );
 
     // Print current time
     info!(
         "[Basher Main] Current time: {:?}",
-        runner.state.current_time
+        runner.current_time
     );
 }
 #[cfg(test)]
